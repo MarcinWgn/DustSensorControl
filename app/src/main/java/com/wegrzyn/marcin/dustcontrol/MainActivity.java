@@ -6,36 +6,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.google.android.things.pio.UartDevice;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Skeleton of an Android Things activity.
- * <p>
- * Android Things peripheral APIs are accessible through the class
- * PeripheralManagerService. For example, the snippet below will open a GPIO pin and
- * set it to HIGH:
- * <p>
- * <pre>{@code
- * PeripheralManagerService service = new PeripheralManagerService();
- * mLedGpio = service.openGpio("BCM6");
- * mLedGpio.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
- * mLedGpio.setValue(true);
- * }</pre>
- * <p>
- * For more complex peripherals, look for an existing user-space driver, or implement one if none
- * is available.
- *
- * @see <a href="https://github.com/androidthings/contrib-drivers#readme">https://github.com/androidthings/contrib-drivers#readme</a>
- */
 public class MainActivity extends Activity {
 
+    public static final String SENSOR_DATA = "SensorData";
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private DisplHt16k33 displHt16k33;
 
     private ButtonLed ledA;
@@ -48,10 +27,19 @@ public class MainActivity extends Activity {
     private HadrwareBtn btnB;
     private HadrwareBtn btnA;
 
-    UartToSDS011 uartToSDS011;
+    private UartToSDS011 uartToSDS011;
+    private SensorSDS011 sds011;
 
-    SensorSDS011 sds011;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
 
+    //    true display PM10 false Pm2.5
+    private boolean whatDsp = true;
+
+    //    workMode 0==sleep 1-30 == time period
+    private int workMode;
+
+    private int selectMode = 1;
 
 
     @Override
@@ -60,17 +48,26 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         init();
+//        Set period measure time sds sensor
+        uartToSDS011.writeData(SensorSDS011.cycle30min);
     }
 
     private void init() {
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference(SENSOR_DATA);
+
+
         displHt16k33 = new DisplHt16k33(1);
-        displHt16k33.display("Test");
+        displHt16k33.display(getString(R.string.wait));
 
         ledA = new ButtonLed(ButtonLed.LedRed);
-        ledA.setLed(false);
+        if (!whatDsp) ledA.setLed(true);
+        else ledA.setLed(false);
 
         ledB = new ButtonLed(ButtonLed.LedGreen);
-        ledB.setLed(false);
+        if (whatDsp) ledB.setLed(true);
+        else ledB.setLed(false);
 
         ledC = new ButtonLed(ButtonLed.LedBlue);
         ledC.setLed(false);
@@ -85,16 +82,44 @@ public class MainActivity extends Activity {
         sds011 = new SensorSDS011();
 
         uartToSDS011 = new UartToSDS011() {
+
             @Override
             public void updateBuffer(byte[] bytes) {
-                Log.d(TAG," data: "+ sds011.readData(bytes));
-                Log.d(TAG," pm2.5: "+ sds011.readPM2(bytes));
-                Log.d(TAG," pm10: "+ sds011.readPM10(bytes));
-                Log.d(TAG, new Date().toString());
+
+
+                Log.d(TAG, "data=" + sds011.readData(bytes));
+
+                if (sds011.isPmData(bytes)) {
+                    sds011 = new SensorSDS011();
+                    Log.d(TAG, "pm 2.5=" + sds011.readPM2(bytes)
+                            + " pm 10=" + sds011.readPM10(bytes)
+                            + " " + sds011.getSensorData().getDate());
+
+                    pushData(sds011.getSensorData());
+                    displayPM();
+                } else if (sds011.isResponse(bytes)) {
+                    Log.d(TAG, "workmode: " +
+                            String.valueOf(workMode = sds011.getPeriodInfo(bytes)));
+                    if (workMode == 0) {
+                        displHt16k33.display("SLP");
+                    } else if (workMode == 1) {
+                        displHt16k33.display("WORK");
+                    } else {
+                        displHt16k33.display("TM" + workMode);
+                    }
+                }
             }
         };
     }
 
+    /**
+     * Push sensor data to Firebase
+     *
+     * @param sensorData
+     */
+    private void pushData(SensorData sensorData) {
+        databaseReference.push().setValue(sensorData);
+    }
 
 
     @Override
@@ -109,30 +134,53 @@ public class MainActivity extends Activity {
         uartToSDS011.unregisterCallback();
     }
 
+    private void displayPM() {
+        if (whatDsp) {
+            displHt16k33.display(String.valueOf(sds011.getSensorData().getPM10()));
+            ledA.setLed(false);
+            ledB.setLed(true);
+        } else {
+            displHt16k33.display(String.valueOf(sds011.getSensorData().getPM2()));
+            ledA.setLed(true);
+            ledB.setLed(false);
+        }
+    }
+
+    private void selectMode() {
+        if (selectMode < 4) {
+            selectMode++;
+        } else selectMode = 1;
+
+        if (selectMode == 1) uartToSDS011.writeData(SensorSDS011.cycle1min);
+        else if (selectMode == 2) uartToSDS011.writeData(SensorSDS011.cycle10min);
+        else if (selectMode == 3) uartToSDS011.writeData(SensorSDS011.cycle20min);
+        else if (selectMode == 4) uartToSDS011.writeData(SensorSDS011.cycle30min);
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
+        switch (keyCode) {
             case KeyEvent.KEYCODE_A:
-                ledA.setLed(true);
-                displHt16k33.display(sds011.getSds011Data().getPM25str());
+                whatDsp = !whatDsp;
+                displayPM();
                 return true;
             case KeyEvent.KEYCODE_B:
+                uartToSDS011.writeData(SensorSDS011.sleep);
                 ledB.setLed(true);
-                displHt16k33.display(sds011.getSds011Data().getPM10str());
                 return true;
             case KeyEvent.KEYCODE_C:
+                selectMode();
                 ledC.setLed(true);
-                displHt16k33.clear();
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
         }
     }
+
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode){
+        switch (keyCode) {
             case KeyEvent.KEYCODE_A:
-                ledA.setLed(false);
                 return true;
             case KeyEvent.KEYCODE_B:
                 ledB.setLed(false);
@@ -144,6 +192,7 @@ public class MainActivity extends Activity {
                 return super.onKeyDown(keyCode, event);
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

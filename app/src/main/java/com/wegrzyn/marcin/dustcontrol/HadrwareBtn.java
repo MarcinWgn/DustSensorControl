@@ -42,7 +42,7 @@ public class HadrwareBtn {
             try {
                 mButtonInputDriver.close();
             } catch (IOException e) {
-                Log.e(TAG,"Error close driver");
+                Log.e(TAG, "Error close driver");
             } finally {
                 mButtonInputDriver = null;
             }

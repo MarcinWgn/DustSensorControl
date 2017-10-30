@@ -29,7 +29,7 @@ public abstract class UartToSDS011 {
         deviceList = manager.getUartDeviceList();
         if (deviceList.isEmpty()) {
             Log.i(TAG, "No UART port available on this device.");
-        } else{
+        } else {
             uartName = deviceList.get(0);
             open(uartName);
         }
@@ -47,7 +47,7 @@ public abstract class UartToSDS011 {
     }
 
     private void readUartBuffer(UartDevice uart) throws IOException {
-        // Maximum amount of data to read at one time
+
         final int maxCount = 10;
         byte[] buffer = new byte[maxCount];
 
@@ -57,7 +57,8 @@ public abstract class UartToSDS011 {
         }
 
     }
-    public void open(String name){
+
+    public void open(String name) {
         try {
             uartDevice = manager.openUartDevice(name);
             configureUartFrame(uartDevice);
@@ -66,7 +67,9 @@ public abstract class UartToSDS011 {
         }
 
     }
+
     public abstract void updateBuffer(byte[] bytes);
+
 
     private void configureUartFrame(UartDevice uart) throws IOException {
         // Configure the UART port
@@ -75,22 +78,32 @@ public abstract class UartToSDS011 {
         uart.setParity(UartDevice.PARITY_NONE);
         uart.setStopBits(1);
     }
-    public void writeData(UartDevice uart) throws IOException {
+
+    public void writeData(byte[] bytes) {
         byte[] buffer = new byte[1024];
-        int count = uart.write(buffer, buffer.length);
+        buffer = bytes;
+        int count = 0;
+        try {
+            count = uartDevice.write(buffer, buffer.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Log.d(TAG, "Wrote " + count + " bytes to peripheral");
     }
-    public void registerCallback(){
+
+    public void registerCallback() {
         try {
             uartDevice.registerUartDeviceCallback(deviceCallback);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void unregisterCallback(){
+
+    public void unregisterCallback() {
         uartDevice.unregisterUartDeviceCallback(deviceCallback);
     }
-    public void close(){
+
+    public void close() {
         if (uartDevice != null) {
             try {
                 uartDevice.close();
