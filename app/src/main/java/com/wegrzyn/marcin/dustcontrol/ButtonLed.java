@@ -16,9 +16,15 @@ public class ButtonLed {
 
     private Gpio gpioLed;
     private static final String TAG = ButtonLed.class.getSimpleName();
+
     static final String LedRed = "GPIO_34";
     static final String LedGreen = "GPIO_32";
     static final String LedBlue = "GPIO_37";
+
+    static final int LedA = 1;
+    static final int LedB = 2;
+    static final int LedC = 3;
+
 
 
     public ButtonLed(String selectGpioLed) {

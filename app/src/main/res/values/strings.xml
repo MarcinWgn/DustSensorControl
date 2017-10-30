@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DustControl</string>
+    <string name="wait">Wait</string>
 </resources>

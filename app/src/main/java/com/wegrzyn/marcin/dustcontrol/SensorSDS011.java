@@ -1,8 +1,6 @@
 package com.wegrzyn.marcin.dustcontrol;
 
-import com.google.android.things.pio.UartDeviceCallback;
-
-import java.sql.Time;
+import java.util.Date;
 
 /**
  * Created by wirea on 22.10.2017.
@@ -10,50 +8,82 @@ import java.sql.Time;
 
 public class SensorSDS011 {
 
-    private SDS011Data sds011Data;
+    public static byte[] sleep = {(byte) 0xAA, (byte) 0xB4, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x05, (byte) 0xAB};
+    public static byte[] work = {(byte) 0xAA, (byte) 0xB4, 0x06, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x06, (byte) 0xAB};
+    public static byte[] continious = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x07, (byte) 0xAB};
+    public static byte[] query = {(byte) 0xAA, (byte) 0xB4, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x00, (byte) 0xAB};
+    public static byte[] cycle1min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x08, (byte) 0xAB};
+    public static byte[] cycle10min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x11, (byte) 0xAB};
+    public static byte[] cycle20min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x1B, (byte) 0xAB};
+    public static byte[] cycle30min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x25, (byte) 0xAB};
+
+    private SensorData sensorData;
+
+
+    private static byte checkSum(byte[] bytes) {
+        byte sum = 0;
+        for (int i = 2; i < bytes.length - 2; i++) {
+            sum += Byte.toUnsignedInt(bytes[i]);
+        }
+        return (byte) sum;
+    }
+
 
     public SensorSDS011() {
-        sds011Data = new SDS011Data();
+        sensorData = new SensorData();
+        sensorData.setDate(new Date());
     }
 
-     String readPM2(byte[]bytes){
+    float readPM2(byte[] bytes) {
         int[] data = toUnsigned(bytes);
         String s = "";
-        float i = ((data[3]<<8)+data[2]);
-        float o = i/10;
-        sds011Data.setPM25str(String.valueOf(o));
-        return sds011Data.getPM25str();
+        float i = ((data[3] << 8) + data[2]);
+        float o = i / 10;
+        sensorData.setPM2(o);
+        return sensorData.getPM2();
     }
 
-     String readPM10(byte[]bytes){
+    float readPM10(byte[] bytes) {
         int[] data = toUnsigned(bytes);
         String s = "";
-        float i = ((data[5]<<8) + data[4]);
-        float o = i/10;
-        sds011Data.setPM10str(String.valueOf(o));
-        return sds011Data.getPM10str();
+        float i = ((data[5] << 8) + data[4]);
+        float o = i / 10;
+        sensorData.setPM10(o);
+        return sensorData.getPM10();
     }
 
-    private int[] toUnsigned(byte[] bytes){
+    private int[] toUnsigned(byte[] bytes) {
         int[] data = new int[10];
-        for (int i =0 ; i<bytes.length;i++){
+        for (int i = 0; i < bytes.length; i++) {
             data[i] = Byte.toUnsignedInt(bytes[i]);
         }
         return data;
     }
 
-    public SDS011Data getSds011Data() {
-        return sds011Data;
+    public SensorData getSensorData() {
+        return sensorData;
     }
 
-    String readData(byte[] bytes){
+    String readData(byte[] bytes) {
         int[] data = toUnsigned(bytes);
         String out = "";
 
-        for(int i = 0 ; i<bytes.length ; i++){
-            out +=" "+Integer.toHexString(data[i]);
+        for (int i = 0; i < bytes.length; i++) {
+            out += " " + Integer.toHexString(data[i]);
         }
         return out;
+    }
+
+    public boolean isPmData(byte[] bytes) {
+        return Byte.toUnsignedInt(bytes[1]) == 0xC0;
+    }
+
+    public boolean isResponse(byte[] bytes) {
+        return Byte.toUnsignedInt(bytes[1]) == 0xC5;
+    }
+
+    public int getPeriodInfo(byte[] bytes) {
+        return Byte.toUnsignedInt(bytes[4]);
     }
 
 }

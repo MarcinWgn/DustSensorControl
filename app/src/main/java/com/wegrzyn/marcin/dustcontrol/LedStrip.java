@@ -20,32 +20,34 @@ public class LedStrip {
 
     public LedStrip() {
 
-        for (int i =0 ; i< strip.length; i++)
+        for (int i = 0; i < strip.length; i++)
             strip[i] = 0;
         try {
             apa102 = new Apa102(SpiName, Apa102.Mode.BGR);
             apa102.setBrightness(LEDSTRIP_BRIGHTNESS);
         } catch (IOException e) {
             apa102 = null; // Led strip is optional.
-            Log.e(TAG,"Error open apa102"+e);
+            Log.e(TAG, "Error open apa102" + e);
         }
     }
-    public void setColor(int[] colorlist){
+
+    public void setColor(int[] colorlist) {
         strip = colorlist;
     }
 
-    public void setOneColor(int oneColor){
-        for (int i =0 ; i < strip.length ; i++){
+    public void setOneColor(int oneColor) {
+        for (int i = 0; i < strip.length; i++) {
             strip[i] = oneColor;
         }
         show();
     }
-    public void modOneColor(int id, int color){
+
+    public void modOneColor(int id, int color) {
         strip[id] = color;
         show();
     }
 
-    public void show(){
+    public void show() {
         try {
             apa102.write(strip);
         } catch (IOException e) {
@@ -53,7 +55,7 @@ public class LedStrip {
         }
     }
 
-    public void close(){
+    public void close() {
         if (apa102 != null) {
             try {
                 apa102.setBrightness(0);

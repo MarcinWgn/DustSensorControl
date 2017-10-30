@@ -23,49 +23,50 @@ public class DisplHt16k33 {
             alphanumericDisplay.setBrightness(1);
             alphanumericDisplay.setEnabled(true);
         } catch (IOException e) {
-            Log.e(TAG,"Error open i2c"+e);
+            Log.e(TAG, "Error open i2c" + e);
         }
     }
 
     /**
-     *
      * @param brightness 1 - 15
      */
     public DisplHt16k33(int brightness) {
 
         try {
             alphanumericDisplay = new AlphanumericDisplay(i2c_port);
-            alphanumericDisplay.setBrightness(brightness);
             alphanumericDisplay.setEnabled(true);
+            alphanumericDisplay.setBrightness(brightness);
         } catch (IOException e) {
-           Log.e(TAG,"Error set brithness"+e);
+            Log.e(TAG, "Error set brithness" + e);
         }
     }
 
 
-    public void display(int data){
+    public void display(int data) {
 
         try {
             alphanumericDisplay.clear();
             alphanumericDisplay.display(data);
 
         } catch (IOException e) {
-            Log.e(TAG,"Error conf display"+e);
+            Log.e(TAG, "Error conf display" + e);
         }
 
     }
-    public void display(String data){
+
+    public void display(String data) {
 
         try {
             alphanumericDisplay.clear();
             alphanumericDisplay.display(data);
 
         } catch (IOException e) {
-            Log.e(TAG,"Error conf display"+e);
+            Log.e(TAG, "Error conf display" + e);
         }
 
     }
-    public void clear (){
+
+    public void clear() {
         try {
             alphanumericDisplay.clear();
         } catch (IOException e) {
@@ -73,12 +74,12 @@ public class DisplHt16k33 {
         }
     }
 
-    public void close(){
-        if(alphanumericDisplay != null){
+    public void close() {
+        if (alphanumericDisplay != null) {
             try {
                 alphanumericDisplay.close();
             } catch (IOException e) {
-                Log.e(TAG,"Error close func");
+                Log.e(TAG, "Error close func");
             }
         }
     }
