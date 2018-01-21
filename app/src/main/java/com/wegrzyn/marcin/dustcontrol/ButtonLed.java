@@ -12,14 +12,14 @@ import java.io.IOException;
  * Created by wirea on 05.10.2017.
  */
 
-public class ButtonLed {
+class ButtonLed {
 
     private Gpio gpioLed;
     private static final String TAG = ButtonLed.class.getSimpleName();
 
-    static final String LedRed = "GPIO_34";
-    static final String LedGreen = "GPIO_32";
-    static final String LedBlue = "GPIO_37";
+    static final String LedRed = "GPIO2_IO02";
+    static final String LedGreen = "GPIO2_IO00";
+    static final String LedBlue = "GPIO2_IO05";
 
     static final int LedA = 1;
     static final int LedB = 2;
@@ -27,7 +27,7 @@ public class ButtonLed {
 
 
 
-    public ButtonLed(String selectGpioLed) {
+    ButtonLed(String selectGpioLed) {
         try {
             PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
             gpioLed = peripheralManagerService.openGpio(selectGpioLed);
@@ -41,7 +41,7 @@ public class ButtonLed {
     }
 
 
-    public void setLed(boolean light){
+    void setLed(boolean light){
         try {
             gpioLed.setValue(light);
         } catch (IOException e) {
@@ -49,7 +49,7 @@ public class ButtonLed {
         }
     }
 
-    public void close() {
+    void close() {
         if (gpioLed != null) {
             try {
                 gpioLed.setValue(false);

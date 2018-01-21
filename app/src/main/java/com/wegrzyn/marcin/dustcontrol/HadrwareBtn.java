@@ -16,9 +16,9 @@ import static com.google.android.things.contrib.driver.button.Button.LogicState.
 public class HadrwareBtn {
 
     private ButtonInputDriver mButtonInputDriver;
-    static final String TouchA = "GPIO_174";
-    static final String TouchB = "GPIO_175";
-    static final String TouchC = "GPIO_39";
+    static final String TouchA = "GPIO6_IO14";
+    static final String TouchB = "GPIO6_IO15";
+    static final String TouchC = "GPIO2_IO07";
     private static final String TAG = HadrwareBtn.class.getSimpleName();
 
 
