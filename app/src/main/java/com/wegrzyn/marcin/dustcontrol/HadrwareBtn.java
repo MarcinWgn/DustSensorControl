@@ -22,7 +22,7 @@ public class HadrwareBtn {
     private static final String TAG = HadrwareBtn.class.getSimpleName();
 
 
-    public HadrwareBtn(String port, int keycode) {
+    HadrwareBtn(String port, int keycode) {
 
         try {
             mButtonInputDriver = new ButtonInputDriver(port,
@@ -35,7 +35,7 @@ public class HadrwareBtn {
 
     }
 
-    public void close() {
+    void close() {
 
         if (mButtonInputDriver != null) {
             mButtonInputDriver.unregister();

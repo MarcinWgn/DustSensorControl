@@ -30,7 +30,6 @@ public class MainActivity extends Activity {
     private UartToSDS011 uartToSDS011;
     private SensorSDS011 sds011;
 
-    private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
 
     //    true display PM10 false Pm2.5
@@ -54,7 +53,7 @@ public class MainActivity extends Activity {
 
     private void init() {
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference(SENSOR_DATA);
 
 
@@ -87,7 +86,7 @@ public class MainActivity extends Activity {
             public void updateBuffer(byte[] bytes) {
 
 
-                Log.d(TAG, "data=" + sds011.readData(bytes));
+                Log.d(TAG, "SDS011_data=" + sds011.readData(bytes));
 
                 if (sds011.isPmData(bytes)) {
                     sds011 = new SensorSDS011();
@@ -98,7 +97,7 @@ public class MainActivity extends Activity {
                     pushData(sds011.getSensorData());
                     displayPM();
                 } else if (sds011.isResponse(bytes)) {
-                    Log.d(TAG, "workmode: " +
+                    Log.d(TAG, "SDS011_workmode: " +
                             String.valueOf(workMode = sds011.getPeriodInfo(bytes)));
                     if (workMode == 0) {
                         displHt16k33.display("SLP");

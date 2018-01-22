@@ -18,32 +18,32 @@ public class SensorData {
         this.date = date;
     }
 
-    public SensorData() {
+    SensorData() {
         PM10 = 0;
         PM2 = 0;
     }
 
-    public float getPM2() {
+    float getPM2() {
         return PM2;
     }
 
-    public float getPM10() {
+    float getPM10() {
         return PM10;
     }
 
-    public Date getDate() {
+    Date getDate() {
         return date;
     }
 
-    public void setPM2(float PM2) {
+    void setPM2(float PM2) {
         this.PM2 = PM2;
     }
 
-    public void setPM10(float PM10) {
+    void setPM10(float PM10) {
         this.PM10 = PM10;
     }
 
-    public void setDate(Date date) {
+    void setDate(Date date) {
         this.date = date;
     }
 }

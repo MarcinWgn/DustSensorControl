@@ -18,19 +18,17 @@ public abstract class UartToSDS011 {
     private final static String TAG = UartToSDS011.class.getSimpleName();
 
     private UartDevice uartDevice;
-    private String uartName;
     private UartDeviceCallback deviceCallback;
     private PeripheralManagerService manager;
-    private List<String> deviceList;
 
 
-    public UartToSDS011() {
+    UartToSDS011() {
         manager = new PeripheralManagerService();
-        deviceList = manager.getUartDeviceList();
+        List<String> deviceList = manager.getUartDeviceList();
         if (deviceList.isEmpty()) {
             Log.i(TAG, "No UART port available on this device.");
         } else {
-            uartName = deviceList.get(0);
+            String uartName = deviceList.get(0);
             open(uartName);
         }
         deviceCallback = new UartDeviceCallback() {
@@ -58,7 +56,7 @@ public abstract class UartToSDS011 {
 
     }
 
-    public void open(String name) {
+    private void open(String name) {
         try {
             uartDevice = manager.openUartDevice(name);
             configureUartFrame(uartDevice);
@@ -79,7 +77,7 @@ public abstract class UartToSDS011 {
         uart.setStopBits(1);
     }
 
-    public void writeData(byte[] bytes) {
+    void writeData(byte[] bytes) {
         byte[] buffer = new byte[1024];
         buffer = bytes;
         int count = 0;
@@ -91,7 +89,7 @@ public abstract class UartToSDS011 {
         Log.d(TAG, "Wrote " + count + " bytes to peripheral");
     }
 
-    public void registerCallback() {
+    void registerCallback() {
         try {
             uartDevice.registerUartDeviceCallback(deviceCallback);
         } catch (IOException e) {
@@ -99,11 +97,11 @@ public abstract class UartToSDS011 {
         }
     }
 
-    public void unregisterCallback() {
+    void unregisterCallback() {
         uartDevice.unregisterUartDeviceCallback(deviceCallback);
     }
 
-    public void close() {
+    void close() {
         if (uartDevice != null) {
             try {
                 uartDevice.close();

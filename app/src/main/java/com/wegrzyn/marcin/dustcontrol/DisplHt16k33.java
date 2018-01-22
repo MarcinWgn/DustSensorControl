@@ -13,7 +13,7 @@ import java.io.IOException;
 public class DisplHt16k33 {
 
     private final static String TAG = DisplHt16k33.class.getSimpleName();
-    final String i2c_port = "I2C1";
+    private final String i2c_port = "I2C1";
     private AlphanumericDisplay alphanumericDisplay;
 
     public DisplHt16k33() {
@@ -30,7 +30,7 @@ public class DisplHt16k33 {
     /**
      * @param brightness 1 - 15
      */
-    public DisplHt16k33(int brightness) {
+    DisplHt16k33(int brightness) {
 
         try {
             alphanumericDisplay = new AlphanumericDisplay(i2c_port);
@@ -54,7 +54,7 @@ public class DisplHt16k33 {
 
     }
 
-    public void display(String data) {
+    void display(String data) {
 
         try {
             alphanumericDisplay.clear();
@@ -74,7 +74,7 @@ public class DisplHt16k33 {
         }
     }
 
-    public void close() {
+    void close() {
         if (alphanumericDisplay != null) {
             try {
                 alphanumericDisplay.close();

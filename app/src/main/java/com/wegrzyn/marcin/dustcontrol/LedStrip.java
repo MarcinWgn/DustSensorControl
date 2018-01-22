@@ -18,7 +18,7 @@ public class LedStrip {
     private static final int LEDSTRIP_BRIGHTNESS = 1;
     private static final String SpiName = "SPI3.1";
 
-    public LedStrip() {
+    LedStrip() {
 
         for (int i = 0; i < strip.length; i++)
             strip[i] = 0;
@@ -35,7 +35,7 @@ public class LedStrip {
         strip = colorlist;
     }
 
-    public void setOneColor(int oneColor) {
+    void setOneColor(int oneColor) {
         for (int i = 0; i < strip.length; i++) {
             strip[i] = oneColor;
         }
@@ -47,7 +47,7 @@ public class LedStrip {
         show();
     }
 
-    public void show() {
+    private void show() {
         try {
             apa102.write(strip);
         } catch (IOException e) {
@@ -55,7 +55,7 @@ public class LedStrip {
         }
     }
 
-    public void close() {
+    void close() {
         if (apa102 != null) {
             try {
                 apa102.setBrightness(0);

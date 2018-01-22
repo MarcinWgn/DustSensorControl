@@ -29,7 +29,7 @@ public class SensorSDS011 {
     }
 
 
-    public SensorSDS011() {
+    SensorSDS011() {
         sensorData = new SensorData();
         sensorData.setDate(new Date());
     }
@@ -60,29 +60,28 @@ public class SensorSDS011 {
         return data;
     }
 
-    public SensorData getSensorData() {
+    SensorData getSensorData() {
         return sensorData;
     }
 
     String readData(byte[] bytes) {
         int[] data = toUnsigned(bytes);
-        String out = "";
-
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
-            out += " " + Integer.toHexString(data[i]);
+            builder.append(Integer.toHexString(data[i]));
         }
-        return out;
+        return builder.toString();
     }
 
-    public boolean isPmData(byte[] bytes) {
+    boolean isPmData(byte[] bytes) {
         return Byte.toUnsignedInt(bytes[1]) == 0xC0;
     }
 
-    public boolean isResponse(byte[] bytes) {
+    boolean isResponse(byte[] bytes) {
         return Byte.toUnsignedInt(bytes[1]) == 0xC5;
     }
 
-    public int getPeriodInfo(byte[] bytes) {
+    int getPeriodInfo(byte[] bytes) {
         return Byte.toUnsignedInt(bytes[4]);
     }
 
