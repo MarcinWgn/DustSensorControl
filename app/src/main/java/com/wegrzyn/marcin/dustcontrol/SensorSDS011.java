@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by wirea on 22.10.2017.
  */
 
-public class SensorSDS011 {
+class SensorSDS011 {
 
     public static byte[] sleep = {(byte) 0xAA, (byte) 0xB4, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x05, (byte) 0xAB};
     public static byte[] work = {(byte) 0xAA, (byte) 0xB4, 0x06, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x06, (byte) 0xAB};
@@ -17,7 +17,6 @@ public class SensorSDS011 {
     public static byte[] cycle20min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x1B, (byte) 0xAB};
     public static byte[] cycle30min = {(byte) 0xAA, (byte) 0xB4, 0x08, 0x01, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, 0x25, (byte) 0xAB};
 
-    private SensorData sensorData;
 
 
     private static byte checkSum(byte[] bytes) {
@@ -28,28 +27,16 @@ public class SensorSDS011 {
         return (byte) sum;
     }
 
-
-    SensorSDS011() {
-        sensorData = new SensorData();
-        sensorData.setDate(new Date());
-    }
-
     float readPM2(byte[] bytes) {
         int[] data = toUnsigned(bytes);
-        String s = "";
         float i = ((data[3] << 8) + data[2]);
-        float o = i / 10;
-        sensorData.setPM2(o);
-        return sensorData.getPM2();
+        return i / 10;
     }
 
     float readPM10(byte[] bytes) {
         int[] data = toUnsigned(bytes);
-        String s = "";
         float i = ((data[5] << 8) + data[4]);
-        float o = i / 10;
-        sensorData.setPM10(o);
-        return sensorData.getPM10();
+        return i / 10;
     }
 
     private int[] toUnsigned(byte[] bytes) {
@@ -58,10 +45,6 @@ public class SensorSDS011 {
             data[i] = Byte.toUnsignedInt(bytes[i]);
         }
         return data;
-    }
-
-    SensorData getSensorData() {
-        return sensorData;
     }
 
     String readData(byte[] bytes) {

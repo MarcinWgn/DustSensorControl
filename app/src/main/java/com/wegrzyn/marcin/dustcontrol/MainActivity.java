@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.google.android.things.pio.PeripheralManagerService;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -27,8 +29,11 @@ public class MainActivity extends Activity {
     private HadrwareBtn btnB;
     private HadrwareBtn btnA;
 
+    private SensorBMP280 bmp280;
+    private SensorData sensorData;
     private UartToSDS011 uartToSDS011;
     private SensorSDS011 sds011;
+
 
     private DatabaseReference databaseReference;
 
@@ -47,6 +52,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         init();
+
 //        Set period measure time sds sensor
         uartToSDS011.writeData(SensorSDS011.cycle30min);
     }
@@ -78,8 +84,15 @@ public class MainActivity extends Activity {
         btnB = new HadrwareBtn(HadrwareBtn.TouchB, KeyEvent.KEYCODE_B);
         btnC = new HadrwareBtn(HadrwareBtn.TouchC, KeyEvent.KEYCODE_C);
 
+        bmp280 = new SensorBMP280();
         sds011 = new SensorSDS011();
+        sensorData = new SensorData();
 
+        updateUart();
+    }
+
+
+    private void updateUart() {
         uartToSDS011 = new UartToSDS011() {
 
             @Override
@@ -89,13 +102,19 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "SDS011_data=" + sds011.readData(bytes));
 
                 if (sds011.isPmData(bytes)) {
-                    sds011 = new SensorSDS011();
-                    Log.d(TAG, "pm 2.5=" + sds011.readPM2(bytes)
-                            + " pm 10=" + sds011.readPM10(bytes)
-                            + " " + sds011.getSensorData().getDate());
 
-                    pushData(sds011.getSensorData());
+                    sensorData.setPM2(sds011.readPM2(bytes));
+                    sensorData.setPM10(sds011.readPM10(bytes));
+                    sensorData.setPress(bmp280.readPress());
+                    sensorData.setTemp(bmp280.readTemp());
+                    sensorData.setDate(new Date());
+
+                    Log.d(TAG, sensorData.toString());
+
+                    pushData(sensorData);
+
                     displayPM();
+
                 } else if (sds011.isResponse(bytes)) {
                     Log.d(TAG, "SDS011_workmode: " +
                             String.valueOf(workMode = sds011.getPeriodInfo(bytes)));
@@ -135,11 +154,11 @@ public class MainActivity extends Activity {
 
     private void displayPM() {
         if (whatDsp) {
-            displHt16k33.display(String.valueOf(sds011.getSensorData().getPM10()));
+            displHt16k33.display(String.valueOf(sensorData.getPM10()));
             ledA.setLed(false);
             ledB.setLed(true);
         } else {
-            displHt16k33.display(String.valueOf(sds011.getSensorData().getPM2()));
+            displHt16k33.display(String.valueOf(sensorData.getPM2()));
             ledA.setLed(true);
             ledB.setLed(false);
         }
@@ -207,6 +226,8 @@ public class MainActivity extends Activity {
         btnA.close();
         btnB.close();
         btnC.close();
+
+        bmp280.close();
 
         uartToSDS011.close();
     }
