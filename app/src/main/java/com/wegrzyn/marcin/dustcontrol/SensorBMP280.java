@@ -5,7 +5,7 @@ import android.util.Log;
 import com.google.android.things.contrib.driver.bmx280.Bmx280;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
+
 
 /**
  * Created by wirea on 22.01.2018.
@@ -20,8 +20,10 @@ class SensorBMP280 {
     SensorBMP280() {
         try {
             bmx280 = new Bmx280(DEVI2CBUS1);
+            bmx280.setMode(Bmx280.MODE_NORMAL);
             bmx280.setTemperatureOversampling(Bmx280.OVERSAMPLING_1X);
             bmx280.setPressureOversampling(Bmx280.OVERSAMPLING_1X);
+
         } catch (IOException e) {
             Log.e(TAG, "Error open bmp280: " + e);
         }
