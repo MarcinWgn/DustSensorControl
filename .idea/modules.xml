@@ -5,7 +5,6 @@
       <module fileurl="file://C:\test\DustSensorControl\DustControl.iml" filepath="C:\test\DustSensorControl\DustControl.iml" />
       <module fileurl="file://$PROJECT_DIR$/DustSensorControl.iml" filepath="$PROJECT_DIR$/DustSensorControl.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\test\DustSensorControl\app\app.iml" filepath="C:\test\DustSensorControl\app\app.iml" />
     </modules>
   </component>
 </project>
