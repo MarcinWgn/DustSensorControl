@@ -2,7 +2,7 @@ package com.wegrzyn.marcin.dustcontrol;
 
 import android.util.Log;
 
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.UartDevice;
 import com.google.android.things.pio.UartDeviceCallback;
 
@@ -19,12 +19,12 @@ public abstract class UartToSDS011 {
 
     private UartDevice uartDevice;
     private UartDeviceCallback deviceCallback;
-    private PeripheralManagerService manager;
-
+    private PeripheralManager manager;
 
     UartToSDS011() {
-        manager = new PeripheralManagerService();
+        manager = PeripheralManager.getInstance();
         List<String> deviceList = manager.getUartDeviceList();
+             Log.d(TAG, "Device list: "+ deviceList.toString());
         if (deviceList.isEmpty()) {
             Log.i(TAG, "No UART port available on this device.");
         } else {
@@ -36,10 +36,11 @@ public abstract class UartToSDS011 {
             public boolean onUartDeviceDataAvailable(UartDevice uart) {
                 try {
                     readUartBuffer(uart);
+                    Log.i(TAG, "read buffer uart");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return super.onUartDeviceDataAvailable(uart);
+                return false;
             }
         };
     }
@@ -53,7 +54,6 @@ public abstract class UartToSDS011 {
         while ((count = uart.read(buffer, buffer.length)) > 0) {
             updateBuffer(buffer);
         }
-
     }
 
     private void open(String name) {
@@ -92,13 +92,16 @@ public abstract class UartToSDS011 {
     void registerCallback() {
         try {
             uartDevice.registerUartDeviceCallback(deviceCallback);
+            Log.d(TAG, "Register callback");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void unregisterCallback() {
+    void unregisterCallback()
+    {
         uartDevice.unregisterUartDeviceCallback(deviceCallback);
+        Log.d(TAG, "Unregister callback");
     }
 
     void close() {

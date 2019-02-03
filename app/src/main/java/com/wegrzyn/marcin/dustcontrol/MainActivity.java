@@ -5,13 +5,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-import com.google.android.things.pio.PeripheralManagerService;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
-import java.util.List;
+
 
 public class MainActivity extends Activity {
 
@@ -34,8 +36,15 @@ public class MainActivity extends Activity {
     private UartToSDS011 uartToSDS011;
     private SensorSDS011 sds011;
 
+    private TextView PM2;
+    private TextView PM10;
+    private TextView mode;
+    private TextView time;
+    private TextView press;
+    private TextView temp;
 
     private DatabaseReference databaseReference;
+    private static FirebaseDatabase firebaseDatabase;
 
     //    true display PM10 false Pm2.5
     private boolean whatDsp = true;
@@ -46,22 +55,90 @@ public class MainActivity extends Activity {
     private int selectMode = 1;
 
 
+//    ***************************************************************
+
+    SeekBar seekBar;
+    int brightness = 155;
+
+
+
+//    ***************************************************************
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getActionBar().hide();
+
+        PM2 = findViewById(R.id.TV_PM2);
+        PM10 = findViewById(R.id.TV_PM10);
+        mode = findViewById(R.id.TV_mode);
+        time = findViewById(R.id.TV_time_mode);
+        press = findViewById(R.id.TV_press);
+        temp = findViewById(R.id.TV_temp);
+
+        mode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uartToSDS011.writeData(SensorSDS011.sleep);
+                ledB.setLed(true);
+
+                Log.d(TAG, "click mode");
+            }
+        });
+
+        time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectMode();
+                ledC.setLed(true);
+
+                Log.d(TAG, "select mode");
+            }
+        });
+
+        setBrightness();
         init();
 
 //        Set period measure time sds sensor
         uartToSDS011.writeData(SensorSDS011.cycle30min);
+
+
+    }
+
+
+    private void setBrightness() {
+
+
+        seekBar = findViewById(R.id.seekBar);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void init() {
 
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference(SENSOR_DATA);
+        if(firebaseDatabase==null){
+            firebaseDatabase= FirebaseDatabase.getInstance();
+            firebaseDatabase.setPersistenceEnabled(true);
+        }
 
+        databaseReference = firebaseDatabase.getReference(SENSOR_DATA);
 
         displHt16k33 = new DisplHt16k33(1);
         displHt16k33.display(getString(R.string.wait));
@@ -99,7 +176,7 @@ public class MainActivity extends Activity {
             public void updateBuffer(byte[] bytes) {
 
 
-                Log.d(TAG, "SDS011_data=" + sds011.readData(bytes));
+                Log.d(TAG, "SDS011_data_read=" + sds011.readData(bytes));
 
                 if (sds011.isPmData(bytes)) {
 
@@ -107,23 +184,27 @@ public class MainActivity extends Activity {
                     sensorData.setPM10(sds011.readPM10(bytes));
                     sensorData.setPress(bmp280.readPress());
                     sensorData.setTemp(bmp280.readTemp());
-                    sensorData.setDate(new Date());
-
+                    sensorData.setPosixTime(new Date().getTime());
+                    
                     Log.d(TAG, sensorData.toString());
 
                     pushData(sensorData);
 
                     displayPM();
+                    displayBigScr();
 
                 } else if (sds011.isResponse(bytes)) {
                     Log.d(TAG, "SDS011_workmode: " +
                             String.valueOf(workMode = sds011.getPeriodInfo(bytes)));
                     if (workMode == 0) {
                         displHt16k33.display("SLP");
+                        mode.setText("sleep");
                     } else if (workMode == 1) {
                         displHt16k33.display("WORK");
+                        mode.setText("work");
                     } else {
                         displHt16k33.display("TM" + workMode);
+                        time.setText("time "+ String.valueOf(workMode));
                     }
                 }
             }
@@ -162,6 +243,15 @@ public class MainActivity extends Activity {
             ledA.setLed(true);
             ledB.setLed(false);
         }
+    }
+
+    private void displayBigScr(){
+        PM10.setText(String.valueOf(sensorData.getPM10()));
+        PM10.setTextColor(Utils.setPm10Color(this,sensorData.getPM10()));
+        PM2.setText(String.valueOf(sensorData.getPM2()));
+        PM2.setTextColor(Utils.setPm2Color(this,sensorData.getPM2()));
+        press.setText(Utils.numberFormat(sensorData.getPress()));
+        temp.setText(Utils.numberFormat(sensorData.getTemp()));
     }
 
     private void selectMode() {

@@ -31,7 +31,7 @@ class SensorBMP280 {
 
     float readTemp() {
         try {
-            return bmx280.readTemperature();
+            return bmx280.readTemperature(); //
         } catch (IOException e) {
             Log.e(TAG, "Error Read Temp: " + e);
             return 0;

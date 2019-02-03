@@ -8,18 +8,19 @@ import java.util.Date;
 
 public class SensorData {
 
+    private long PosixTime;
     private float PM2;
     private float PM10;
     private float Temp;
     private float Press;
-    private Date date;
 
-    public SensorData(float PM2, float PM10, float Press, float Temp, Date date) {
+
+    public SensorData(float PM2, float PM10, float Press, float Temp, long PosixTime) {
         this.PM2 = PM2;
         this.PM10 = PM10;
         this.Press = Press;
         this.Temp = Temp;
-        this.date = date;
+        this.PosixTime = PosixTime;
     }
 
     SensorData() {
@@ -45,9 +46,9 @@ public class SensorData {
         return Press;
     }
 
-    Date getDate() {
-        return date;
-    }
+    long getPosixTime() {return PosixTime; }
+
+    void setPosixTime(long posixTime) { PosixTime = posixTime; }
 
     void setPM2(float PM2) {
         this.PM2 = PM2;
@@ -65,28 +66,22 @@ public class SensorData {
         Press = press;
     }
 
-    void setDate(Date date) {
-        this.date = date;
-    }
+
 
     @Override
     public String toString() {
-
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("PM 2.5: ");
-        builder.append(String.valueOf(PM2));
-        builder.append("\n");
-        builder.append("PM 10: ");
-        builder.append(String.valueOf(PM10));
-        builder.append("\n");
-        builder.append("Temp: ");
-        builder.append(String.valueOf(Temp));
-        builder.append("\n");
-        builder.append("Press: ");
-        builder.append(String.valueOf(Press));
-        builder.append("\n");
-        builder.append(date.toString());
-        return builder.toString();
+        return "PM 2.5: " +
+                String.valueOf(PM2) +
+                "\n" +
+                "PM 10: " +
+                String.valueOf(PM10) +
+                "\n" +
+                "Temp: " +
+                String.valueOf(Temp) +
+                "\n" +
+                "Press: " +
+                String.valueOf(Press) +
+                "\n" +
+                new Date(PosixTime).toString();
     }
 }

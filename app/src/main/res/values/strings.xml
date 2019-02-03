@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">DustControl</string>
     <string name="wait">Wait</string>
+    <string name="ug_m3">ug/m3</string>
+    <string name="pm2_5">PM2.5</string>
+    <string name="pm10">PM10</string>
+    <string name="time">time</string>
+    <string name="_0_0">0.0</string>
+    <string name="press">press</string>
+    <string name="mbar">mBar</string>
+    <string name="temp">temp</string>
+    <string name="celsius">°C</string>
+    <string name="brightness">brightness</string>
+    <string name="mode">mode</string>
+    <string name="hpa">hPa</string>
 </resources>

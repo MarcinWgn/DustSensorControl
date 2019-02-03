@@ -1,10 +1,9 @@
 package com.wegrzyn.marcin.dustcontrol;
 
 import android.util.Log;
-import android.util.MutableBoolean;
 
 import com.google.android.things.pio.Gpio;
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 
 import java.io.IOException;
 
@@ -29,8 +28,10 @@ class ButtonLed {
 
     ButtonLed(String selectGpioLed) {
         try {
-            PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
-            gpioLed = peripheralManagerService.openGpio(selectGpioLed);
+
+            PeripheralManager peripheralManager = PeripheralManager.getInstance();
+
+            gpioLed = peripheralManager.openGpio(selectGpioLed);
             gpioLed.setEdgeTriggerType(Gpio.EDGE_NONE);
             gpioLed.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
             gpioLed.setActiveType(Gpio.ACTIVE_HIGH);

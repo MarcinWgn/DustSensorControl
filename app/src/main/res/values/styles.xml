@@ -3,4 +3,14 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar" />
 
+    <style name="digit_style">
+        <item name="android:textSize">60sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="label_style">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold|italic</item>
+    </style>
+
 </resources>
