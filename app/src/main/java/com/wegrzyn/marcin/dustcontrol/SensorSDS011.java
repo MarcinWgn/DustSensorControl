@@ -1,7 +1,5 @@
 package com.wegrzyn.marcin.dustcontrol;
 
-import java.util.Date;
-
 /**
  * Created by wirea on 22.10.2017.
  */

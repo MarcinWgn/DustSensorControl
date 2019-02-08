@@ -18,31 +18,42 @@ public abstract class UartToSDS011 {
     private final static String TAG = UartToSDS011.class.getSimpleName();
 
     private UartDevice uartDevice;
-    private UartDeviceCallback deviceCallback;
     private PeripheralManager manager;
+    private UartDeviceCallback uartDeviceCallback;
 
-    UartToSDS011() {
+    UartToSDS011(){
         manager = PeripheralManager.getInstance();
         List<String> deviceList = manager.getUartDeviceList();
-             Log.d(TAG, "Device list: "+ deviceList.toString());
         if (deviceList.isEmpty()) {
             Log.i(TAG, "No UART port available on this device.");
         } else {
-            String uartName = deviceList.get(0);
-            open(uartName);
+            Log.i(TAG, "List of available devices: " + deviceList);
         }
-        deviceCallback = new UartDeviceCallback() {
+
+        try {
+            uartDevice = manager.openUartDevice(deviceList.get(0));
+            configureUartFrame(uartDevice);
+        } catch (IOException e) {
+            Log.w(TAG, "Unable to access UART device", e);
+        }
+
+        uartDeviceCallback = new UartDeviceCallback() {
             @Override
-            public boolean onUartDeviceDataAvailable(UartDevice uart) {
+            public boolean onUartDeviceDataAvailable(UartDevice uartDevice) {
+                Log.d(TAG,"jakies dane" );
                 try {
-                    readUartBuffer(uart);
-                    Log.i(TAG, "read buffer uart");
+                    readUartBuffer(uartDevice);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return false;
+                return true;
             }
         };
+        try {
+            uartDevice.registerUartDeviceCallback(uartDeviceCallback);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void readUartBuffer(UartDevice uart) throws IOException {
@@ -53,7 +64,9 @@ public abstract class UartToSDS011 {
         int count;
         while ((count = uart.read(buffer, buffer.length)) > 0) {
             updateBuffer(buffer);
+            Log.d(TAG," count: "+ String.valueOf(count));
         }
+        Log.d(TAG," count: "+ String.valueOf(count));
     }
 
     private void open(String name) {
@@ -69,7 +82,7 @@ public abstract class UartToSDS011 {
     public abstract void updateBuffer(byte[] bytes);
 
 
-    private void configureUartFrame(UartDevice uart) throws IOException {
+     static void configureUartFrame(UartDevice uart) throws IOException {
         // Configure the UART port
         uart.setBaudrate(9600);
         uart.setDataSize(8);
@@ -89,18 +102,9 @@ public abstract class UartToSDS011 {
         Log.d(TAG, "Wrote " + count + " bytes to peripheral");
     }
 
-    void registerCallback() {
-        try {
-            uartDevice.registerUartDeviceCallback(deviceCallback);
-            Log.d(TAG, "Register callback");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     void unregisterCallback()
     {
-        uartDevice.unregisterUartDeviceCallback(deviceCallback);
+        uartDevice.unregisterUartDeviceCallback(uartDeviceCallback);
         Log.d(TAG, "Unregister callback");
     }
 

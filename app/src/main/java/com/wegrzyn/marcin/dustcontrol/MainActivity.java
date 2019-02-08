@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.things.pio.UartDevice;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -64,6 +65,7 @@ public class MainActivity extends Activity {
 
 //    ***************************************************************
 
+    UartDevice mDevice = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +170,6 @@ public class MainActivity extends Activity {
         updateUart();
     }
 
-
     private void updateUart() {
         uartToSDS011 = new UartToSDS011() {
 
@@ -220,17 +221,10 @@ public class MainActivity extends Activity {
         databaseReference.push().setValue(sensorData);
     }
 
-
-    @Override
-    protected void onStart() {
-        uartToSDS011.registerCallback();
-        super.onStart();
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
-        uartToSDS011.unregisterCallback();
+       uartToSDS011.unregisterCallback();
     }
 
     private void displayPM() {

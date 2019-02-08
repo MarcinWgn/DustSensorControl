@@ -1,7 +1,6 @@
 package com.wegrzyn.marcin.dustcontrol;
 
 import android.util.Log;
-import android.view.KeyEvent;
 
 import com.google.android.things.contrib.driver.button.ButtonInputDriver;
 
