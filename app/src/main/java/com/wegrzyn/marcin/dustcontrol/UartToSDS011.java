@@ -40,7 +40,6 @@ public abstract class UartToSDS011 {
         uartDeviceCallback = new UartDeviceCallback() {
             @Override
             public boolean onUartDeviceDataAvailable(UartDevice uartDevice) {
-                Log.d(TAG,"jakies dane" );
                 try {
                     readUartBuffer(uartDevice);
                 } catch (IOException e) {
@@ -82,7 +81,7 @@ public abstract class UartToSDS011 {
     public abstract void updateBuffer(byte[] bytes);
 
 
-     static void configureUartFrame(UartDevice uart) throws IOException {
+     private static void configureUartFrame(UartDevice uart) throws IOException {
         // Configure the UART port
         uart.setBaudrate(9600);
         uart.setDataSize(8);

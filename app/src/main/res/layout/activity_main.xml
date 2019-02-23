@@ -159,29 +159,14 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/TV_temp"
         app:layout_constraintStart_toStartOf="@+id/TV_press_unit" />
 
-
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="246dp"
-        android:layout_height="48dp"
+    <TextClock
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:max="255"
-        android:min="0"
-        android:orientation="vertical"
+        android:textSize="45sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.272"
-        app:layout_constraintStart_toEndOf="@+id/TV_brightness" />
-
-    <TextView
-        android:id="@+id/TV_brightness"
-        style="@style/label_style"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="@string/brightness"
-        app:layout_constraintBottom_toBottomOf="@+id/seekBar"
-        app:layout_constraintEnd_toEndOf="@+id/TV_temp_label" />
+        tools:text="Time" />
 
 </android.support.constraint.ConstraintLayout>

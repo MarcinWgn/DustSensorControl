@@ -2,10 +2,13 @@ package com.wegrzyn.marcin.dustcontrol;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.QuickContactBadge;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
     private TextView press;
     private TextView temp;
 
+
     private DatabaseReference databaseReference;
     private static FirebaseDatabase firebaseDatabase;
 
@@ -59,7 +63,6 @@ public class MainActivity extends Activity {
 //    ***************************************************************
 
     SeekBar seekBar;
-    int brightness = 155;
 
 
 
@@ -100,8 +103,6 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "select mode");
             }
         });
-
-        setBrightness();
         init();
 
 //        Set period measure time sds sensor
@@ -111,27 +112,7 @@ public class MainActivity extends Activity {
     }
 
 
-    private void setBrightness() {
 
-
-        seekBar = findViewById(R.id.seekBar);
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-    }
 
     private void init() {
 
